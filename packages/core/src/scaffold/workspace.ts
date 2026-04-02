@@ -13,7 +13,11 @@ import {
 } from './templates.js';
 
 export interface ScaffoldOptions {
-  /** Absolute path to the workspace root (where .switchboard/ will be created) */
+  /**
+   * Absolute path to the workspace root (where .switchboard/ will be created).
+   * In production, pass `resolveDropPath(sessionId)` from kb/writer.ts.
+   * In local dev, any writable directory works.
+   */
   workspaceRoot: string;
   /** Human-readable name for this workspace */
   workspaceName?: string;

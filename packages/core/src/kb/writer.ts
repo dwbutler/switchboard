@@ -76,9 +76,32 @@ function parseMarkdown(raw: string, fallbackId: string): KBEntry {
   };
 }
 
+/**
+ * Resolve the output root for a provisioning session.
+ *
+ * In production (read-only FS), writes go to:
+ *   $DROP_PATH/<sessionId>/
+ *
+ * In local dev, defaults to:
+ *   ./drop/<sessionId>/
+ *
+ * The `drop/` directory is write-only in production — the agent cannot read
+ * back what it writes there. Each session gets its own subdirectory so
+ * concurrent provisioning jobs don't collide.
+ */
+export function resolveDropPath(sessionId: string): string {
+  const base = process.env['DROP_PATH'] ?? './drop';
+  return path.join(base, sessionId);
+}
+
 export class KBWriter {
   private kbRoot: string;
 
+  /**
+   * @param workspaceRoot - where to write the .switchboard/ tree.
+   *   In production, pass `resolveDropPath(sessionId)`.
+   *   In local dev, pass any writable directory (or omit to use DROP_PATH default).
+   */
   constructor(workspaceRoot: string) {
     this.kbRoot = path.join(workspaceRoot, '.switchboard', 'knowledge-base');
   }
